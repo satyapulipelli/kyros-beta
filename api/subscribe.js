@@ -37,7 +37,8 @@ export default async function handler(req, res) {
 
   try {
     // Airtable API call
-    const response = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Email%20Signups`, {
+    const tableName = encodeURIComponent('Email Signups');
+    const response = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${tableName}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
