@@ -5,10 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge.jsx'
 import { MapPin, Star, Users, Dumbbell, Clock, CheckCircle, ArrowRight, Smartphone, CreditCard, Shield, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import './App.css'
-import heroMockup from './assets/hero-app-mockup.png'
-import appMockup1 from './assets/app-mockup-1.png'
-import appMockup2 from './assets/app-mockup-2.png'
-import appMockup3 from './assets/app-mockup-3.png'
+import heroMockup from './assets/hero-app-mockup-a87ba8ff.png'
+import appMockup1 from './assets/app-mockup-1-39c03b37.png'
+import appMockup2 from './assets/app-mockup-2-a93bf095.png'
+import appMockup3 from './assets/app-mockup-3-a191474d.png'
 
 function App() {
   const [email, setEmail] = useState('')
