@@ -1,4 +1,29 @@
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { email } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  // DEBUG: Check if environment variables are loaded
+  console.log('AIRTABLE_BASE_ID:', process.env.AIRTABLE_BASE_ID);
+  console.log('AIRTABLE_API_KEY exists:', !!process.env.AIRTABLE_API_KEY);
+  console.log('AIRTABLE_API_KEY first 10 chars:', process.env.AIRTABLE_API_KEY?.substring(0, 10));
+
+  // Test response to check if env vars are working
+  if (!process.env.AIRTABLE_API_KEY || !process.env.AIRTABLE_BASE_ID) {
+    return res.status(500).json({ 
+      error: 'Environment variables not set',
+      hasApiKey: !!process.env.AIRTABLE_API_KEY,
+      hasBaseId: !!process.env.AIRTABLE_BASE_ID
+    });
+  }
+  
+  export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
