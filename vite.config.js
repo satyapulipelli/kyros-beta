@@ -4,7 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/kyros-beta/',  // Add this back for GitHub Pages
+  base: '/kyros-beta/',  // Required for GitHub Pages
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
