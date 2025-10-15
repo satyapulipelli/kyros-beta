@@ -5,10 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge.jsx'
 import { MapPin, Star, Users, Dumbbell, Clock, CheckCircle, ArrowRight, Smartphone, CreditCard, Shield, X, ChevronLeft, ChevronRight, Calculator, TrendingDown, Heart, Briefcase, Plane, Calendar, Phone, Search, XCircle, DollarSign, Zap, Building, TrendingUp, Plus, Activity, Target, Award, ArrowUp, Mail } from 'lucide-react'
 import './App.css'
-import heroMockup from './assets/hero-app-mockup.png'
-import appMockup1 from './assets/app-mockup-1.png'
+
+// Import Firebase services
+import { addToWaitlistFast as addToWaitlist, saveWaitlistWithSurvey } from './firebase/services'
+
+// Import your new Figma mockups
+import homeScreen from './assets/home-screen.png'
+import gymDiscovery from './assets/gym-discovery.png'
+import bookingConfirmation from './assets/booking-confirmation.png'
+import mapDiscovery from './assets/map-discovery.png'
 import appMockup2 from './assets/app-mockup-2.png'
-import appMockup3 from './assets/app-mockup-3.png'
 
 function App() {
   const [email, setEmail] = useState('')
@@ -25,6 +31,7 @@ function App() {
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(false)
   const [membershipType, setMembershipType] = useState('yearly') // 'monthly' or 'yearly'
+  // Removed carousel state - using single hero mockup
   
   // Calculator states - updated for monthly/yearly options
   const [monthlyFee, setMonthlyFee] = useState(3000)
@@ -34,6 +41,8 @@ function App() {
   // Refs for scroll
   const problemCardsRef = useRef(null)
   const problemSectionRef = useRef(null)
+
+  // Using single hero mockup - no carousel
 
   // Calculate savings with improved dynamic pricing logic
   const calculateSavings = () => {
@@ -312,7 +321,7 @@ function App() {
     return re.test(email);
   };
 
-  const handleEmailSubmit = () => {
+  const handleEmailSubmit = async () => {
     setEmailError('');
     
     if (!email) {
@@ -325,31 +334,44 @@ function App() {
       return;
     }
     
+    // Show success immediately for instant feedback
     setIsSubmitted(true);
     setShowModal(true);
     setSurveyAnswers({ email });
     setCurrentQuestion(0);
+    
+    // Save to Firebase in background (don't wait)
+    addToWaitlist(email).catch(error => {
+      console.error('Background save error:', error);
+    });
   };
 
   const handleCalculate = () => {
     setHasCalculated(true);
   };
 
-  const handleSurveyAnswer = (answer) => {
-    setSurveyAnswers(prev => ({
-      ...prev,
+  const handleSurveyAnswer = async (answer) => {
+    const newAnswers = {
+      ...surveyAnswers,
       [surveyQuestions[currentQuestion].id]: answer
-    }));
+    };
+    setSurveyAnswers(newAnswers);
     
     if (currentQuestion < surveyQuestions.length - 1) {
       setTimeout(() => {
         setCurrentQuestion(prev => prev + 1);
       }, 500);
     } else {
+      // Survey complete - close modal immediately
       setTimeout(() => {
         setShowModal(false);
-        console.log('Survey completed:', surveyAnswers);
+        setCurrentQuestion(0);
       }, 500);
+      
+      // Save survey in background (don't wait)
+      saveWaitlistWithSurvey(email, newAnswers).catch(error => {
+        console.error('Background survey save error:', error);
+      });
     }
   };
 
@@ -504,18 +526,12 @@ function App() {
             </nav>
             <button
               onClick={() => {
-                if (!isSubmitted) {
-                  const heroEmailElement = document.getElementById('hero-email-section');
-                  if (heroEmailElement) {
-                    heroEmailElement.scrollIntoView({ behavior: 'smooth' });
-                    setTimeout(() => {
-                      const emailInput = document.getElementById('hero-email');
-                      if (emailInput) emailInput.focus();
-                    }, 500);
-                  }
-                } else {
-                  setShowModal(true);
-                }
+                // Scroll to top of page where hero is
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => {
+                  const emailInput = document.getElementById('hero-email');
+                  if (emailInput) emailInput.focus();
+                }, 800);
               }}
               className="hidden md:block px-5 py-2 border-2 border-indigo-400 text-indigo-600 rounded-lg hover:bg-indigo-400 hover:text-white transition-colors font-medium"
             >
@@ -525,7 +541,7 @@ function App() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section with Animated Mockup Carousel */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -608,15 +624,13 @@ function App() {
               </div>
             </div>
 
-            {/* Hero Mockup */}
+            {/* Hero Mockup - Single Image */}
             <div className="order-1 lg:order-2 flex justify-center">
-              <div className="relative">
-                <img 
-                  src={heroMockup} 
-                  alt="KYROS App" 
-                  className="h-96 w-auto drop-shadow-2xl"
-                />
-              </div>
+              <img 
+                src={homeScreen} 
+                alt="KYROS App - Home Screen" 
+                className="h-[500px] w-auto drop-shadow-2xl"
+              />
             </div>
           </div>
         </div>
@@ -713,7 +727,7 @@ function App() {
         </div>
       </section>
 
-      {/* Calculator + How It Works Section */}
+      {/* Calculator + How It Works Section with YOUR MOCKUPS */}
       <section id="calculator" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -915,54 +929,54 @@ function App() {
                 </Card>
               </div>
 
-              {/* How It Works - Right Side (60%) */}
+              {/* How It Works - Right Side (60%) with YOUR MOCKUPS */}
               <div className="lg:col-span-3">
                 <div className="grid md:grid-cols-3 gap-6">
-                  {/* Step 1 */}
+                  {/* Step 1 - Discovery */}
                   <div className="text-center">
                     <div className="mb-4 flex justify-center">
                       <img 
-                        src={appMockup1} 
-                        alt="Discover" 
-                        className="h-64 w-auto rounded-xl shadow-lg"
+                        src={gymDiscovery} 
+                        alt="Discover Gyms" 
+                        className="h-72 w-auto drop-shadow-xl"
                       />
                     </div>
                     <Badge className="mb-2 bg-indigo-100 text-indigo-700">Step 1</Badge>
                     <h3 className="font-semibold text-gray-900">Discover</h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      Find gyms near you. Real prices upfront.
+                      Browse gyms, yoga studios & more. See real prices.
                     </p>
                   </div>
 
-                  {/* Step 2 */}
+                  {/* Step 2 - Choose & Book */}
                   <div className="text-center">
                     <div className="mb-4 flex justify-center">
                       <img 
-                        src={appMockup2} 
-                        alt="Choose Pass" 
-                        className="h-64 w-auto rounded-xl shadow-lg"
+                        src={mapDiscovery} 
+                        alt="Choose & Book" 
+                        className="h-72 w-auto drop-shadow-xl"
                       />
                     </div>
                     <Badge className="mb-2 bg-indigo-100 text-indigo-700">Step 2</Badge>
-                    <h3 className="font-semibold text-gray-900">Choose Pass</h3>
+                    <h3 className="font-semibold text-gray-900">Choose & Book</h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      Daily, weekly, or sessions. Pick what fits.
+                      Pick your gym, select a pass. Book instantly.
                     </p>
                   </div>
 
-                  {/* Step 3 */}
+                  {/* Step 3 - Confirmation */}
                   <div className="text-center">
                     <div className="mb-4 flex justify-center">
                       <img 
-                        src={appMockup3} 
-                        alt="Book & Go" 
-                        className="h-64 w-auto rounded-xl shadow-lg"
+                        src={bookingConfirmation} 
+                        alt="Booking Confirmed" 
+                        className="h-72 w-auto drop-shadow-xl"
                       />
                     </div>
                     <Badge className="mb-2 bg-indigo-100 text-indigo-700">Step 3</Badge>
-                    <h3 className="font-semibold text-gray-900">Book & Go</h3>
+                    <h3 className="font-semibold text-gray-900">Show & Go</h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      QR code confirmation. Walk in and workout.
+                      Flash your QR code. Walk in like a member.
                     </p>
                   </div>
                 </div>
@@ -972,6 +986,7 @@ function App() {
         </div>
       </section>
 
+      {/* Rest of your sections remain the same... */}
       {/* Target Audience Section */}
       <section id="audience" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1216,7 +1231,7 @@ function App() {
       </footer>
 
       {/* CSS for flip animation and scrollbar hiding */}
-      <style jsx>{`
+      <style>{`
         .rotate-y-180 {
           transform: rotateY(180deg);
         }
