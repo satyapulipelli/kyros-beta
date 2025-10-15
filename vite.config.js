@@ -4,8 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  // Use different base paths for different environments
-  base: process.env.VITE_BASE_URL || '/',
+  base: '/kyros-beta/',  // Required for GitHub Pages
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
