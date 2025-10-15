@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Button } from '@/components/ui/button.jsx'
 import { Input } from '@/components/ui/input.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
@@ -1244,8 +1245,9 @@ function App() {
         }
       `}</style>
       
-      {/* Vercel Analytics */}
+      {/* Vercel Analytics & Speed Insights */}
       <Analytics />
+      <SpeedInsights />
     </div>
   )
 }
