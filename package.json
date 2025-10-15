@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx vite build",
+    "build": "vite build",
+    "build:gh-pages": "cross-env VITE_BASE_URL=/kyros-beta/ vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && npx gh-pages -d dist"
+    "deploy": "npm run build:gh-pages && npx gh-pages -d dist"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.6",
@@ -25,6 +26,7 @@
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.14",
+    "cross-env": "^10.1.0",
     "gh-pages": "^5.0.0",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.0",
