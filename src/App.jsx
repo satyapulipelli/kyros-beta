@@ -552,7 +552,7 @@ function App() {
                 Coming Soon
               </Badge>
               <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-6">
-                Access Any Gym, Anytime.
+                Access Any Fitness Center, Anytime.
                 <span className="text-indigo-500"> Save Every Time.</span>
               </h1>
               <p className="text-xl text-gray-600 mb-3">
@@ -645,8 +645,11 @@ function App() {
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Transform Your Fitness Experience
             </h2>
-            <p className="text-xl text-gray-600">
-              Hover over cards to see the KYROS difference
+            <p className="text-xl text-gray-600 mb-2">
+              See how KYROS solves every fitness frustration
+            </p>
+            <p className="text-sm font-medium text-indigo-600">
+              Hover or tap cards to flip
             </p>
           </div>
 
@@ -875,6 +878,11 @@ function App() {
                                 </span>
                               </div>
                               
+                              {/* With KYROS Subheading */}
+                              <div className="mb-2">
+                                <span className="text-indigo-600 font-semibold text-sm">With KYROS</span>
+                              </div>
+                              
                               <div className="space-y-2">
                                 <div className="flex justify-between items-baseline">
                                   <span className="text-gray-700 text-sm">Monthly Savings:</span>
@@ -910,7 +918,22 @@ function App() {
                           </div>
 
                           <Button 
-                            onClick={handleEmailSubmit}
+                            onClick={() => {
+                              // Scroll to hero section
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              // Focus email input after scroll
+                              setTimeout(() => {
+                                const emailInput = document.getElementById('hero-email');
+                                if (emailInput) {
+                                  emailInput.focus();
+                                  // Add a subtle highlight animation
+                                  emailInput.classList.add('ring-2', 'ring-indigo-500');
+                                  setTimeout(() => {
+                                    emailInput.classList.remove('ring-2', 'ring-indigo-500');
+                                  }, 2000);
+                                }
+                              }, 800);
+                            }}
                             className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:shadow-lg text-white"
                           >
                             Start Saving ₹{savings.annualSavings.toLocaleString()}/Year →
@@ -962,7 +985,7 @@ function App() {
                     <Badge className="mb-2 bg-indigo-100 text-indigo-700">Step 2</Badge>
                     <h3 className="font-semibold text-gray-900">Choose & Book</h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      Pick your gym, select a pass. Book instantly.
+                      Pick your center, select a pass. Book instantly.
                     </p>
                   </div>
 
