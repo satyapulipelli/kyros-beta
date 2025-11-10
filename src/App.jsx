@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button.jsx'
 import { Input } from '@/components/ui/input.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
-import { MapPin, Star, Users, Dumbbell, Clock, CheckCircle, ArrowRight, Smartphone, CreditCard, Shield, X, ChevronLeft, ChevronRight, Calculator, TrendingDown, Heart, Briefcase, Plane, Calendar, Phone, Search, XCircle, DollarSign, Zap, Building, TrendingUp, Plus, Activity, Target, Award, ArrowUp, Mail } from 'lucide-react'
+import { MapPin, Star, Users, Dumbbell, Clock, CheckCircle, ArrowRight, Smartphone, CreditCard, Shield, X, ChevronLeft, ChevronRight, Calculator, TrendingDown, Heart, Briefcase, Plane, Calendar, Phone, Search, XCircle, DollarSign, Zap, Building, TrendingUp, Plus, Activity, Target, Award, ArrowUp, Mail, Menu } from 'lucide-react'
 import './App.css'
 
 // Import Firebase services
@@ -33,6 +33,7 @@ function App() {
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(false)
   const [membershipType, setMembershipType] = useState('yearly') // 'monthly' or 'yearly'
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   // Removed carousel state - using single hero mockup
   
   // Calculator states - updated for monthly/yearly options
@@ -391,6 +392,115 @@ function App() {
         </button>
       )}
 
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Menu Panel */}
+      <div className={`fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 md:hidden ${
+        isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <div className="p-6">
+          {/* Close button */}
+          <div className="flex justify-between items-center mb-8">
+            <span className="text-2xl font-bold text-gray-900">
+              KYROS<span className="text-indigo-400">.</span>
+            </span>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="h-6 w-6 text-gray-600" />
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="space-y-1">
+            <a 
+              href="#problems" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block py-3 px-4 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors font-medium"
+            >
+              Problems We Solve
+            </a>
+            <a 
+              href="#calculator" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block py-3 px-4 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors font-medium"
+            >
+              Savings Calculator
+            </a>
+            <a 
+              href="#calculator" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block py-3 px-4 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors font-medium"
+            >
+              How It Works
+            </a>
+            <a 
+              href="#audience" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block py-3 px-4 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors font-medium"
+            >
+              Who It's For
+            </a>
+            <a 
+              href="#faq" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block py-3 px-4 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors font-medium"
+            >
+              FAQs
+            </a>
+          </nav>
+
+          {/* CTA Button */}
+          <div className="mt-8">
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                // Scroll to email section
+                const emailSection = document.getElementById('hero-email-section');
+                if (emailSection) {
+                  const header = document.querySelector('header');
+                  const headerHeight = header ? header.offsetHeight : 0;
+                  const elementPosition = emailSection.getBoundingClientRect().top;
+                  const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20;
+                  
+                  window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                  });
+                  
+                  setTimeout(() => {
+                    const emailInput = document.getElementById('hero-email');
+                    if (emailInput) emailInput.focus();
+                  }, 800);
+                }
+              }}
+              className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+            >
+              Join Waitlist
+            </button>
+          </div>
+
+          {/* Bottom Info */}
+          <div className="absolute bottom-6 left-6 right-6">
+            <div className="pt-6 border-t border-gray-200">
+              <p className="text-sm text-gray-500 text-center">
+                Save 30-70% on fitness access
+              </p>
+              <p className="text-xs text-gray-400 text-center mt-1">
+                Coming soon to your city
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Survey Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
@@ -526,19 +636,31 @@ function App() {
                 FAQs
               </a>
             </nav>
-            <button
-              onClick={() => {
-                // Scroll to top of page where hero is
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                setTimeout(() => {
-                  const emailInput = document.getElementById('hero-email');
-                  if (emailInput) emailInput.focus();
-                }, 800);
-              }}
-              className="hidden md:block px-5 py-2 border-2 border-indigo-400 text-indigo-600 rounded-lg hover:bg-indigo-400 hover:text-white transition-colors font-medium"
-            >
-              Join Waitlist
-            </button>
+            <div className="flex items-center space-x-3">
+              {/* Desktop Join Waitlist Button */}
+              <button
+                onClick={() => {
+                  // Scroll to top of page where hero is
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setTimeout(() => {
+                    const emailInput = document.getElementById('hero-email');
+                    if (emailInput) emailInput.focus();
+                  }, 800);
+                }}
+                className="hidden md:block px-5 py-2 border-2 border-indigo-400 text-indigo-600 rounded-lg hover:bg-indigo-400 hover:text-white transition-colors font-medium"
+              >
+                Join Waitlist
+              </button>
+              
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Open menu"
+              >
+                <Menu className="h-6 w-6 text-gray-700" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -919,20 +1041,36 @@ function App() {
 
                           <Button 
                             onClick={() => {
-                              // Scroll to hero section
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                              // Focus email input after scroll
-                              setTimeout(() => {
-                                const emailInput = document.getElementById('hero-email');
-                                if (emailInput) {
-                                  emailInput.focus();
-                                  // Add a subtle highlight animation
-                                  emailInput.classList.add('ring-2', 'ring-indigo-500');
-                                  setTimeout(() => {
-                                    emailInput.classList.remove('ring-2', 'ring-indigo-500');
-                                  }, 2000);
-                                }
-                              }, 800);
+                              // Get the email section element
+                              const emailSection = document.getElementById('hero-email-section');
+                              if (emailSection) {
+                                // Get the header height for proper offset
+                                const header = document.querySelector('header');
+                                const headerHeight = header ? header.offsetHeight : 0;
+                                
+                                // Get the position of the email section
+                                const elementPosition = emailSection.getBoundingClientRect().top;
+                                const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20; // 20px extra padding
+                                
+                                // Scroll to the calculated position
+                                window.scrollTo({
+                                  top: offsetPosition,
+                                  behavior: 'smooth'
+                                });
+                                
+                                // Focus the email input after scrolling completes
+                                setTimeout(() => {
+                                  const emailInput = document.getElementById('hero-email');
+                                  if (emailInput) {
+                                    emailInput.focus();
+                                    // Add a subtle highlight animation
+                                    emailInput.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
+                                    setTimeout(() => {
+                                      emailInput.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2');
+                                    }, 3000);
+                                  }
+                                }, 800);
+                              }
                             }}
                             className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:shadow-lg text-white"
                           >
