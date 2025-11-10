@@ -15,25 +15,31 @@ const SURVEY_COLLECTION = 'survey_responses';
 // Add email to waitlist - INSTANT VERSION
 export const addToWaitlistFast = async (email) => {
   try {
-    // Just add immediately - no checks
     const docRef = await addDoc(collection(db, WAITLIST_COLLECTION), {
       email: email.toLowerCase(),
       timestamp: serverTimestamp(),
       status: 'pending',
       source: 'website'
     });
-
-    return { 
-      success: true, 
+    
+    // Send to Google Sheets in background
+    sendToGoogleSheets({
+      type: 'waitlist',
+      email: email.toLowerCase(),
+      status: 'pending',
+      source: 'website'
+    });
+    
+    return {
+      success: true,
       id: docRef.id,
-      message: 'Successfully added to waitlist!' 
+      message: 'Successfully added to waitlist!'
     };
   } catch (error) {
     console.error('Error adding to waitlist:', error);
-    // Still return success to not block user
-    return { 
-      success: true, 
-      message: 'Added to waitlist!' 
+    return {
+      success: false,
+      message: 'Failed to add to waitlist. Please try again.'
     };
   }
 };
@@ -116,23 +122,24 @@ export const addSurveyResponse = async (surveyData) => {
 };
 
 // Combined function to save both email and survey
-export const saveWaitlistWithSurvey = async (email, surveyAnswers) => {
+export const saveWaitlistWithSurvey = async (email, surveyData) => {
   try {
-    // Use the FAST version for instant submission
     const waitlistResult = await addToWaitlistFast(email);
     
-    if (!waitlistResult.success && !waitlistResult.message.includes('already')) {
-      return waitlistResult;
-    }
-
-    // Then save survey response with email reference
-    const surveyData = {
+    const surveyPayload = {
       email: email.toLowerCase(),
       waitlistId: waitlistResult.id || null,
-      ...surveyAnswers
+      ...surveyData
     };
-
-    const surveyResult = await addSurveyResponse(surveyData);
+    
+    const surveyResult = await saveSurvey(surveyPayload);
+    
+    // Send survey to Google Sheets
+    sendToGoogleSheets({
+      type: 'survey',
+      ...surveyData,
+      email: email.toLowerCase()
+    });
     
     return {
       success: true,
@@ -142,9 +149,30 @@ export const saveWaitlistWithSurvey = async (email, surveyAnswers) => {
     };
   } catch (error) {
     console.error('Error in saveWaitlistWithSurvey:', error);
-    return { 
-      success: false, 
-      message: 'Something went wrong. Please try again.' 
+    return {
+      success: false,
+      message: 'Something went wrong. Please try again.'
     };
+  }
+};
+
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzO3K7kGFRZ3_DVWrezQsr0-5QcZQE5IWm6ax0wD88a2vjeZSCSxQTlXg3kbu0SLTHVEw/exec';
+
+// Add this function to send data to Google Sheets
+const sendToGoogleSheets = async (data) => {
+  try {
+    // Note: We use no-cors mode because Google Apps Script doesn't support CORS
+    await fetch(GOOGLE_SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+      body: JSON.stringify(data)
+    });
+    console.log('Sent to Google Sheets');
+  } catch (error) {
+    console.error('Error sending to sheets:', error);
+    // Don't throw - this is a background operation
   }
 };
