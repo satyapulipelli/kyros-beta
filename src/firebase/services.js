@@ -132,7 +132,7 @@ export const saveWaitlistWithSurvey = async (email, surveyData) => {
       ...surveyData
     };
     
-    const surveyResult = await saveSurvey(surveyPayload);
+    const surveyResult = await addSurveyResponse(surveyPayload);
     
     // Send survey to Google Sheets
     sendToGoogleSheets({
