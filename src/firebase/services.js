@@ -124,15 +124,17 @@ export const addSurveyResponse = async (surveyData) => {
 // Combined function to save both email and survey
 export const saveWaitlistWithSurvey = async (email, surveyData) => {
   try {
-    const waitlistResult = await addToWaitlistFast(email);
+    // Don't add to waitlist again - it was already added in handleEmailSubmit
+    // Just save the survey data
     
     const surveyPayload = {
       email: email.toLowerCase(),
-      waitlistId: waitlistResult.id || null,
-      ...surveyData
+      ...surveyData,
+      timestamp: serverTimestamp(),
+      completed: true
     };
     
-    const surveyResult = await addSurveyResponse(surveyPayload);
+    const surveyResult = await addDoc(collection(db, SURVEY_COLLECTION), surveyPayload);
     
     // Send survey to Google Sheets
     sendToGoogleSheets({
@@ -143,9 +145,8 @@ export const saveWaitlistWithSurvey = async (email, surveyData) => {
     
     return {
       success: true,
-      waitlistId: waitlistResult.id,
       surveyId: surveyResult.id,
-      message: 'Successfully joined waitlist!'
+      message: 'Survey completed successfully!'
     };
   } catch (error) {
     console.error('Error in saveWaitlistWithSurvey:', error);
@@ -156,7 +157,7 @@ export const saveWaitlistWithSurvey = async (email, surveyData) => {
   }
 };
 
-const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzO3K7kGFRZ3_DVWrezQsr0-5QcZQE5IWm6ax0wD88a2vjeZSCSxQTlXg3kbu0SLTHVEw/exec';
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz8nvf_uGxFW4KbRQEakcY1UlEOugHUP95CigtCfK8vD6ESDFLRT7lLIUaZwo8ULWATMw/exec';
 
 // Add this function to send data to Google Sheets
 const sendToGoogleSheets = async (data) => {

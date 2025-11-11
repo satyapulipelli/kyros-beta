@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { Analytics } from '@vercel/analytics/react'
-import { SpeedInsights } from '@vercel/speed-insights/react'
+// import { Analytics } from '@vercel/analytics/react'
+// import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Button } from '@/components/ui/button.jsx'
 import { Input } from '@/components/ui/input.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
@@ -1406,9 +1406,92 @@ function App() {
         }
       `}</style>
       
-      {/* Vercel Analytics & Speed Insights */}
-      <Analytics />
-      <SpeedInsights />
+      {/* Temporary Import Button - Only shows on localhost */}
+      {window.location.hostname === 'localhost' && (
+        <button
+          onClick={async () => {
+            console.log('🚀 Starting Firebase to Google Sheets import...');
+            
+            try {
+              // Import Firestore functions
+              const { collection, getDocs } = await import('firebase/firestore');
+              const { db } = await import('./firebase/config');
+              
+              const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz8nvf_uGxFW4KbRQEakcY1UlEOugHUP95CigtCfK8vD6ESDFLRT7lLIUaZwo8ULWATMw/exec';
+              
+              let waitlistCount = 0;
+              let surveyCount = 0;
+              
+              // Import waitlist entries
+              console.log('📋 Fetching waitlist entries...');
+              const waitlistSnapshot = await getDocs(collection(db, 'waitlist'));
+              
+              for (const doc of waitlistSnapshot.docs) {
+                const data = doc.data();
+                
+                await fetch(SHEETS_URL, {
+                  method: 'POST',
+                  mode: 'no-cors',
+                  body: JSON.stringify({
+                    type: 'waitlist',
+                    email: data.email || '',
+                    status: data.status || 'pending',
+                    source: data.source || 'website'
+                  })
+                });
+                
+                waitlistCount++;
+                console.log(`✅ Imported waitlist: ${data.email}`);
+                
+                // Small delay to avoid overwhelming the API
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Increased to 1 second
+              }
+              
+              // Import survey responses
+              console.log('📝 Fetching survey responses...');
+              const surveySnapshot = await getDocs(collection(db, 'survey_responses'));
+              
+              for (const doc of surveySnapshot.docs) {
+                const data = doc.data();
+                
+                await fetch(SHEETS_URL, {
+                  method: 'POST',
+                  mode: 'no-cors',
+                  body: JSON.stringify({
+                    type: 'survey',
+                    email: data.email || '',
+                    userType: data.userType || '',
+                    features: data.features || '',
+                    painPoint: data.painPoint || '',
+                    priceRange: data.priceRange || '',
+                    location: data.location || ''
+                  })
+                });
+                
+                surveyCount++;
+                console.log(`✅ Imported survey: ${data.email}`);
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+              }
+              
+              alert(`🎉 Import Complete!\n\nImported:\n- ${waitlistCount} waitlist entries\n- ${surveyCount} survey responses\n\nCheck your Google Sheets!`);
+              console.log('🎉 Import finished!');
+              
+            } catch (error) {
+              console.error('❌ Import error:', error);
+              alert('Error during import. Check console for details.');
+            }
+          }}
+          className="fixed bottom-4 left-4 z-50 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg font-medium transition-colors"
+          title="Import all Firebase data to Google Sheets"
+        >
+          📥 Import Firebase to Sheets
+        </button>
+      )}
+      
+      {/* Vercel Analytics & Speed Insights - Only work when deployed to Vercel */}
+      {/* <Analytics /> */}
+      {/* <SpeedInsights /> */}
     </div>
   )
 }
